@@ -120,5 +120,5 @@ def visualize_unpaired(path, kind="train"):
             file = random.choice(files)
             axarr[i, j].imshow(pltimg.imread(path+"/{}B/".format(kind)+file)) 
             axarr[i, j].set_title(path+"/{}B/".format(kind)+file)
-    plt.show() #show
+    plt.show()
     
