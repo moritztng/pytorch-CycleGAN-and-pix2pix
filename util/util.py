@@ -4,6 +4,9 @@ import torch
 import numpy as np
 from PIL import Image
 import os
+import random
+import matplotlib.pyplot as plt
+import matplotlib.image as pltimg
 
 
 def tensor2im(input_image, imtype=np.uint8):
@@ -101,3 +104,21 @@ def mkdir(path):
     """
     if not os.path.exists(path):
         os.makedirs(path)
+        
+def visualize_unpaired(path, kind="train"):
+    f, axarr = plt.subplots(2, 4, figsize=(20,10))
+    f.suptitle("Random Images From Both Sets", fontsize=30)
+    files = os.listdir(path+"/{}A".format(kind))
+    for i in range(2):
+        for j in range(2):     
+            file = random.choice(files)
+            axarr[i, j].imshow(pltimg.imread(path+"/{}A/".format(kind)+file)) 
+            axarr[i, j].set_title(path+"/{}A/".format(kind)+file)
+    files = os.listdir(path+"/{}B".format(kind))
+    for i in range(2):
+        for j in range(2,4): 
+            file = random.choice(files)
+            axarr[i, j].imshow(pltimg.imread(path+"/{}B/".format(kind)+file)) 
+            axarr[i, j].set_title(path+"/{}B/".format(kind)+file)
+    plt.show()
+    
