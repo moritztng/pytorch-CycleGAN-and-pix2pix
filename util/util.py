@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as pltimg
 
 
+
 def tensor2im(input_image, imtype=np.uint8):
     """"Converts a Tensor array into a numpy image array.
 
@@ -108,17 +109,75 @@ def mkdir(path):
 def visualize_unpaired(path, kind="train"):
     f, axarr = plt.subplots(2, 4, figsize=(20,10))
     f.suptitle("Random Images From Both Sets", fontsize=30)
-    files = os.listdir(path+"/{}A".format(kind))
-    for i in range(2):
-        for j in range(2):     
-            file = random.choice(files)
-            axarr[i, j].imshow(pltimg.imread(path+"/{}A/".format(kind)+file)) 
-            axarr[i, j].set_title(path+"/{}A/".format(kind)+file)
-    files = os.listdir(path+"/{}B".format(kind))
-    for i in range(2):
-        for j in range(2,4): 
-            file = random.choice(files)
-            axarr[i, j].imshow(pltimg.imread(path+"/{}B/".format(kind)+file)) 
-            axarr[i, j].set_title(path+"/{}B/".format(kind)+file)
+    if os.path.exists(path+"/{}A".format(kind)):
+        files = os.listdir(path+"/{}A".format(kind))
+        for i in range(2):
+            for j in range(2):     
+                file = random.choice(files)
+                axarr[i, j].imshow(pltimg.imread(path+"/{}A/".format(kind)+file)) 
+    if os.path.exists(path+"/{}B".format(kind)):
+        files = os.listdir(path+"/{}B".format(kind))
+        for i in range(2):
+            for j in range(2,4): 
+                file = random.choice(files)
+                axarr[i, j].imshow(pltimg.imread(path+"/{}B/".format(kind)+file)) 
     plt.show()
+
+def resolution_distribution(path, kind="train"):
+    a_widths = []
+    a_heights = []
+    if os.path.exists(path+"/{}A".format(kind)):
+        files = os.listdir(path+"/{}A".format(kind))
+        for file in files:
+            im = Image.open(path+"/{}A/".format(kind)+file)
+            width, height = im.size
+            a_widths.append(width)
+            a_heights.append(height)
+    b_widths = []
+    b_heights = []
+    if os.path.exists(path+"/{}B".format(kind)):
+        files = os.listdir(path+"/{}B".format(kind))
+        for file in files:
+            im = Image.open(path+"/{}B/".format(kind)+file)
+            width, height = im.size
+            b_widths.append(width)
+            b_heights.append(height)
+            if height<256:
+                print(file)
+    fig = plt.figure()
+    ax = fig.add_axes([0,0,1,1])
+    if a_heights and b_heights:
+        sizes = [a_heights, b_heights, a_widths, b_widths]
+    elif a_heights:
+        sizes = [a_heights, a_widths]
+    elif b_heights:
+        sizes = [b_heights, b_widths]
+    bp = ax.violinplot(sizes)
+    plt.show()
+    
+    a_heights_arr = np.array(a_heights)
+    a_widths_arr = np.array(a_widths)
+    b_heights_arr = np.array(b_heights)
+    b_widths_arr = np.array(b_widths)
+    if(a_heights):
+        print("Set A Heights: Min: {}, Mean: {}, Max: {}".format(a_heights_arr.min(), a_heights_arr.mean(), a_heights_arr.max()))
+        print("Set A Widths: Min: {}, Mean: {}, Max: {}".format(a_widths_arr.min(), a_widths_arr.mean(), a_widths_arr.max()))
+    if(b_heights):
+        print("Set B Heights: Min: {}, Mean: {}, Max: {}".format(b_heights_arr.min(), b_heights_arr.mean(), b_heights_arr.max()))
+        print("Set B Widths: Min: {}, Mean: {}, Max: {}".format(b_widths_arr.min(), b_widths_arr.mean(), b_widths_arr.max()))
+    
+def scale_images(path, factor):
+    files = os.listdir(path)
+    for file in files:
+        filepath = os.path.join(path,file)
+        img = Image.open(filepath)
+        width, height = img.size
+        img.thumbnail((width*factor, height*factor))
+        img.save(filepath)
+        
+    
+        
+    
+    
+    
     
